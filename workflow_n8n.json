@@ -1,0 +1,126 @@
+{
+  "name": "Prueba Técnica - Asistente RAG Soporte",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pregunta",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        48
+      ],
+      "id": "df039a71-73b2-4dde-8c3c-088ac92ce3bf",
+      "name": "Webhook Entrada",
+      "webhookId": "a7d3e9da-c1cf-44d1-b927-5a9c39e91d08"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        48
+      ],
+      "id": "75896b3e-e575-4b90-981d-6e7a96485a7f",
+      "name": "Responder Usuario"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Sos un ingeniero de soporte técnico de Nivel 3 experto en la plataforma MineCatalog. Tu objetivo es resolver la duda del usuario de forma clara, directa y altamente técnica.\n\nReglas estrictas de respuesta:\n1. Basate ÚNICAMENTE en el contexto provisto. Si la pregunta del usuario es un texto sin sentido, caracteres aleatorios (como \"asdasd\"), o la respuesta simplemente no está en los documentos, NO uses la estructura de Diagnóstico/Causas. En su lugar, respondé únicamente con este texto corto: \"Lo siento, la consulta no coincide con ningún módulo o error registrado en la base de conocimientos actual. Por favor, especificá mejor tu problema.\" y saltá directo al bloque de cierre de soporte técnico.\n2. Si el contexto menciona \"Posibles causas\" para un problema real, listalas de forma ordenada usando viñetas.\n3. Si el contexto incluye \"Solución\" o \"Acciones recomendadas\", es obligatorio que extraigas esos pasos y se los expliques detalladamente al usuario paso a paso.\n4. Mantené un tono profesional y enfocado en la resolución del problema.\n\nSi el problema es real y se encuentra en los documentos, estructura tu respuesta así:\n- Diagnóstico\n- Causas Posibles\n- Solución Recomendada\n\nAl final de TODO (tanto si resolviste la duda como si tuviste que decir que no), agrega SIEMPRE este bloque de cierre exacto de forma fija:\n\n###  ¿El problema persiste? Contacto de Soporte Técnico\nSi la incidencia no pudo ser resuelta con esta documentación, por favor contactá al área de soporte:\n- **Correo:** soporte.minecatalog@empresa.com\n- **Horario:** Lunes a viernes, 08h00 - 17h00\n\n**Niveles de atención:**\n- Nivel 1: Soporte funcional\n- Nivel 2: Soporte técnico\n- Nivel 3: Administración de base de datos e infraestructura\n\n **Información recomendada al reportar tu incidente:**\nPara agilizar tu caso, por favor incluye en el correo: tu usuario, fecha/hora del error, módulo, una captura de pantalla, el código del material (si aplica), el mensaje de error mostrado y la acción que intentabas realizar.\n\n\nCONTEXTO: {{ $json.body?.contexto }}\nPREGUNTA: {{ $json.body?.pregunta }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        192,
+        48
+      ],
+      "id": "61d618bd-4be6-44e5-9edd-584f7f57c828",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        -80
+      ],
+      "id": "31becd4a-5e64-4ac0-8d3b-a8f000dd3906",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "R9l5J0sUhFGzc8WW",
+          "name": "OpenAI account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Entrada": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Responder Usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "30bde3fa-56da-4548-8c9d-2a55a325b6e5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fbca712c7ce3acfa5a9f09d54eee761eab6924dd4c1a5559d2514e5509623a9"
+  },
+  "id": "7udaGVNIZr1htfBj",
+  "tags": []
+}

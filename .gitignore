@@ -1,0 +1,22 @@
+Python compilado y caches
+
+pycache/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+Entornos virtuales
+
+.venv/
+venv/
+env/
+
+Archivos de configuración locales
+
+.env
+.env
+__pycache__/
+*.pyc
+venv/
+.DS_Store
